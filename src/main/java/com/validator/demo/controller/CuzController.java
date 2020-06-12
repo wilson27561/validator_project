@@ -25,7 +25,7 @@ public class CuzController {
 	
 	@RequestMapping(value="/detail",method = RequestMethod.POST)
 	public @ResponseBody TPCuzResponse<TPCuz0010Res> detail(@RequestBody TPCuzRequest<TPCuz0010Req> request){
-	
+		//check cuz Test
 		return cuzService.getTPCuzDetail(request);
 	}
 }
