@@ -1,0 +1,62 @@
+buildscript {
+	ext {
+		springBootVersion = '2.0.2.RELEASE'
+	}
+	repositories {
+		mavenCentral()
+	}
+	dependencies {
+		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+		classpath files('out/production/classes', 'bin', 'bin/main', 'build/classes/java/main', 'forGradleInit')
+	}
+}
+
+plugins {
+	id 'org.springframework.boot' version '2.3.0.RELEASE'
+	id 'io.spring.dependency-management' version '1.0.9.RELEASE'
+	id 'java'
+	id 'java-library'
+}
+
+repositories {
+	mavenCentral()
+	jcenter()
+	flatDir {
+		dirs 'libs'
+	}
+}
+
+dependencies {
+	compile 'org.springframework.boot:spring-boot-starter-web'
+	compile("org.apache.commons:commons-lang3")
+    compile group: 'org.javassist', name: 'javassist', version: '3.18.2-GA'
+	//providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
+	compile('org.springframework.boot:spring-boot-starter-aop')
+	testImplementation('org.springframework.boot:spring-boot-starter-test') {
+		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+	}
+}
+
+test {
+	useJUnitPlatform()
+}
+
+jar {
+	enabled = true
+	baseName = "validate"
+	version = "1.06.12.01"
+	from sourceSets.main.java
+	exclude 'com/validator/demo/config/**'
+	exclude 'com/validator/demo/controller/**'
+	
+	// 此設定會在打包的時候將compile所depency的jar全部解開跟我們的程式放在一起打包
+	 from {
+	 	configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+	 }
+   // exclude('LICENSE.txt', 'NOTICE.txt', 'rootdoc.txt')
+   // exclude 'META-INF/*.RSA', 'META-INF/*.SF', 'META-INF/*.DSA'
+   // exclude 'META-INF/NOTICE', 'META-INF/NOTICE.txt'
+   //  exclude 'META-INF/LICENSE', 'META-INF/LICENSE.txt'
+   //  exclude 'META-INF/DEPENDENCIES'
+   
+}
