@@ -10,9 +10,11 @@ import java.lang.annotation.Target;
 public @interface Validator {
 	
 	String parameterType() default "";
-
-	String pattern() default "";
 	
+	String pattern() default"";
+	
+	String basicPattern() default "";
+		
 	String returnCode() default "欄位檢核錯誤";
 	
 	String name() default "";

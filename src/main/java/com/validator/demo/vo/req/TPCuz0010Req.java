@@ -12,7 +12,8 @@ public class TPCuz0010Req extends TPCuzReqBody {
 
 
 	@JsonProperty("cuzId")
-	@Validator(parameterType="Param",pattern="^[A-Za-z0-9]+$")
+//	,pattern="^[A-Za-z0-9]+$"
+	@Validator(parameterType="Param",basicPattern="nationalIndividual")
 	private String cuzId;
 	@JsonProperty("actionType")
 	@Validator(parameterType="Param")

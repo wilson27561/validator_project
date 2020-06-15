@@ -12,7 +12,9 @@ import org.springframework.stereotype.Component;
 import com.validator.demo.annotation.Validator;
 import com.validator.demo.aop.ValidatorAspect;
 import com.validator.demo.constant.RtnCode;
+import com.validator.demo.constant.ValidatorConst;
 import com.validator.demo.exception.ReqValidatorException;
+import com.validator.demo.util.IdNumberUtil;
 import com.validator.demo.util.PojoUtil;
 
 @Component
@@ -32,10 +34,12 @@ public class ReqValidator {
 			Validator annotation = PojoUtil.getAnnotation(field);
 			if (annotation != null) {
 				Object fieldValue = PojoUtil.invokeMethod(method, inputObj);
-				if (annotation.parameterType().equals("List")) {
+				// 集合
+				if (annotation.parameterType().equals(ValidatorConst.LIST)) {
 					checkList(field, fieldValue);
 				}
-				if (annotation.parameterType().equals("Object")) {
+				// 物件
+				if (annotation.parameterType().equals(ValidatorConst.OBJECT)) {
 					Class clazz = Class.forName(getClassName(field.getType().toString()));
 					String objectMethodName = "get" + field.getName().toLowerCase();
 					Method objectmethod = methodMap.get(objectMethodName);
@@ -43,26 +47,89 @@ public class ReqValidator {
 					Object objAsType = clazz.cast(objectField);
 					this.validate(objAsType);
 				}
-				if (annotation.parameterType().equals("Param")) {
+				// 參數
+				if (annotation.parameterType().equals(ValidatorConst.PARAM)) {
 					checkPattern(annotation, fieldValue, field.getName());
+					checkBasicPattern(annotation, fieldValue, field.getName());
 				}
 			}
 		}
 	}
-	
-	private void checkList(Field field,Object fieldValue) throws Exception {
-		if(Iterable.class.isAssignableFrom(field.getType())) {
-			for(Object iteratedObj : (Iterable)fieldValue) {
+
+	private void checkList(Field field, Object fieldValue) throws Exception {
+		if (Iterable.class.isAssignableFrom(field.getType())) {
+			for (Object iteratedObj : (Iterable) fieldValue) {
 				this.validate(iteratedObj);
 			}
-		}else {
+		} else {
 			this.validate(fieldValue);
 		}
 	}
-	
-	
+
+	private void checkBasicPattern(Validator annotation, Object fieldValue, String fieldName) {
+		String type = annotation.basicPattern();
+		// 確認Type
+		if (StringUtils.isNotBlank(type)) {
+			// 不等於字串
+			if (!isValidString(fieldValue)) {
+				throw ReqValidatorException.createByErrCodeAndArgs(RtnCode.C0098, new String[] { fieldName });
+			}
+			if (ValidatorConst.NATIONAL_INDIVIDUAL.equals(type)) {
+				if (!IdNumberUtil.isValidNationalIndividual((String) fieldValue)) {
+					throw ReqValidatorException.createByErrCodeAndArgs(RtnCode.C0098, new String[] { fieldName });
+				}
+			}
+			if (ValidatorConst.NATIONAL_LEGAL_PERSON.equals(type)) {
+				if (!IdNumberUtil.isValidNationalLegalPerson((String) fieldValue)) {
+					throw ReqValidatorException.createByErrCodeAndArgs(RtnCode.C0098, new String[] { fieldName });
+				}
+			}
+			if (ValidatorConst.FOREIGN_INDIVIDUAL.equals(type)) {
+				if (!IdNumberUtil.isValidForeignIndividual((String) fieldValue)) {
+					throw ReqValidatorException.createByErrCodeAndArgs(RtnCode.C0098, new String[] { fieldName });
+				}
+			}
+			if (ValidatorConst.FOREIGN_LEGAL_PERSON.equals(type)) {
+				if (!IdNumberUtil.isValidForeignLegalPerson((String) fieldValue)) {
+					throw ReqValidatorException.createByErrCodeAndArgs(RtnCode.C0098, new String[] { fieldName });
+				}
+			}
+
+		}
+
+	}
+
+	private void checkPattern(Validator annotation, Object fieldValue, String fieldName) {
+		String pattern = annotation.pattern();
+		if (StringUtils.isNotBlank(pattern)) {
+			// 不等於字串
+			if (!isValidString(fieldValue)) {
+				throw ReqValidatorException.createByErrCodeAndArgs(RtnCode.C0098, new String[] { fieldName });
+			}
+			// 字串非空且不matchPattern拋錯
+			if (StringUtils.isNotBlank((String) fieldValue) && !((String) fieldValue).matches(pattern)) {
+				LOGGER.info("pattern is invalid");
+				throw ReqValidatorException.createByErrCodeAndArgs(RtnCode.C0098, new String[] { fieldName });
+			}
+		}
+	}
+
+	// 參數不等於字串
+	private boolean isValidString(Object fieldValue) {
+		if (fieldValue instanceof String) {
+			if (StringUtils.isNotBlank((String) fieldValue)) {
+				return true;
+			} else {
+				LOGGER.error("String is Empty");
+				return false;
+			}
+		}
+		LOGGER.error("Value can't instance String");
+		return false;
+	}
+
 	private String getClassName(String fieldName) {
-		String [] classNameArray = fieldName.split("class");
+		String[] classNameArray = fieldName.split("class");
 		return classNameArray[1].trim();
 	}
 
@@ -72,22 +139,5 @@ public class ReqValidator {
 		Method method = methodMap.get(methodName);
 		return method;
 	}
-	private void checkPattern(Validator annotation, Object fieldValue, String fieldName) {
-		String pattern = annotation.pattern();
-		String name = annotation.name();
-		if(StringUtils.isNotBlank(pattern)) {
-			//不等於字串
-			if(!(fieldValue instanceof String)) {
-				
-				throw ReqValidatorException.createByErrCodeAndArgs(RtnCode.C0098, new String[] {fieldName});
-			}
-			//字串非空且不matchPattern拋錯
-			if(StringUtils.isNotBlank((String)fieldValue) && !((String)fieldValue).matches(pattern)) {
-				LOGGER.info("pattern is invalid");
-				throw ReqValidatorException.createByErrCodeAndArgs(RtnCode.C0098, new String[] {fieldName});
-			}
-			
-			
-		}
-	}
+
 }

@@ -44,9 +44,9 @@ test {
 jar {
 	enabled = true
 	baseName = "validate"
-	version = "1.06.12.01"
+	version = "1.06.15.01"
 	from sourceSets.main.java
-	exclude 'com/validator/demo/config/**'
+	//exclude 'com/validator/demo/config/**'
 	exclude 'com/validator/demo/controller/**'
 	
 	// 此設定會在打包的時候將compile所depency的jar全部解開跟我們的程式放在一起打包

@@ -10,17 +10,17 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupp
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-@Configuration
-public class WebMvcConfiguration extends WebMvcConfigurationSupport{
-
-	  @Override
-	    protected void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
-	        for(HttpMessageConverter converter: converters) {
-	            if(converter instanceof MappingJackson2HttpMessageConverter) {
-	                ObjectMapper mapper = ((MappingJackson2HttpMessageConverter)converter).getObjectMapper();
-	                mapper.setSerializationInclusion(Include.NON_NULL);
-	            }
-	        }
-	    }
-	  
-}
+//@Configuration
+//public class WebMvcConfiguration extends WebMvcConfigurationSupport{
+//
+//	  @Override
+//	    protected void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
+//	        for(HttpMessageConverter converter: converters) {
+//	            if(converter instanceof MappingJackson2HttpMessageConverter) {
+//	                ObjectMapper mapper = ((MappingJackson2HttpMessageConverter)converter).getObjectMapper();
+//	                mapper.setSerializationInclusion(Include.NON_NULL);
+//	            }
+//	        }
+//	    }
+//	  
+//}
