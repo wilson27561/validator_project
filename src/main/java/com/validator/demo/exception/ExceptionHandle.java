@@ -28,6 +28,15 @@ public class ExceptionHandle {
 
 		return ResponseEntity.status(HttpStatus.OK).body(new TPCuzResponse<>(tpCuzResHeader));
 	}
+	@ExceptionHandler
+	public ResponseEntity<Object> CustomExceptionHandle(CustomException ex,HttpServletRequest request){
+		LOGGER.error("req validator error ",ex);
+		TPCuzResHeader tpCuzResHeader = new TPCuzResHeader();
+		tpCuzResHeader.setRtnCode("C0096");
+		tpCuzResHeader.setRtnMsg(ex.getErrMsg());
+
+		return ResponseEntity.status(HttpStatus.OK).body(new TPCuzResponse<>(tpCuzResHeader));
+	}
 	
 	
 }

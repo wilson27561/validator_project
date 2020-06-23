@@ -15,6 +15,6 @@ public class ValidatorConst {
 	//物件屬性
 	public static final String OBJECT = "Object";
 	//List屬性
-	public static final String LIST = "Object";
+	public static final String LIST = "List";
 
 }

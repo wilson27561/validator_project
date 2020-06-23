@@ -55,7 +55,6 @@ public class ValidatorAspect<T> {
 		
 		int i = 0;
 		for (Object obj : objs) {
-			LOGGER.info(" i start : {} "+i);
 		String requestClassName = getRequestClassName(joinPoint, parameterName[i]);
 			//取出該obj 轉型的 ClassName
 			Class clazz = Class.forName(requestClassName);

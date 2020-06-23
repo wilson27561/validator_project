@@ -13,6 +13,7 @@ import com.validator.demo.annotation.Validator;
 import com.validator.demo.aop.ValidatorAspect;
 import com.validator.demo.constant.RtnCode;
 import com.validator.demo.constant.ValidatorConst;
+import com.validator.demo.exception.CustomException;
 import com.validator.demo.exception.ReqValidatorException;
 import com.validator.demo.util.IdNumberUtil;
 import com.validator.demo.util.PojoUtil;
@@ -66,7 +67,7 @@ public class ReqValidator {
 		}
 	}
 
-	private void checkBasicPattern(Validator annotation, Object fieldValue, String fieldName) {
+	private void checkBasicPattern(Validator annotation, Object fieldValue, String fieldName) throws Exception {
 		String type = annotation.basicPattern();
 		// 確認Type
 		if (StringUtils.isNotBlank(type)) {
@@ -76,6 +77,26 @@ public class ReqValidator {
 			}
 			if (ValidatorConst.NATIONAL_INDIVIDUAL.equals(type)) {
 				if (!IdNumberUtil.isValidNationalIndividual((String) fieldValue)) {
+//					throw ReqValidatorException.createByErrCodeAndArgs(RtnCode.C0098, new String[] { fieldName });
+					annotation.classes();
+
+					LOGGER.info("annotation.classes : {} ",annotation.classes().getName());
+//					LOGGER.info("annotation.classes : {} ",annotation.classes().clone());
+//					CustomException customException = new CustomException("錯誤訊息");
+					
+//					Class clz = Class.forName("cc.openhome.Student");
+//					// 指定參數型態
+//					Class[] params = {String.class, Integer.TYPE};
+//					Constructor constructor = clz.getConstructor(params);
+//					// 指定參數內容
+//					Object[] paramObjs = {"caterpillar", new Integer(90)};
+//					// 實例化
+//					Object obj = constructor.newInstance(paramObjs);
+//					System.out.println(obj);
+					Class[] params = {String.class};
+					CustomException customException = (CustomException) annotation.classes().newInstance();
+					RuntimeException exception = customException;
+				
 					throw ReqValidatorException.createByErrCodeAndArgs(RtnCode.C0098, new String[] { fieldName });
 				}
 			}
